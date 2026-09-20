@@ -57,3 +57,53 @@ Modul: Use Case sisi Penyelenggara (Campus Volunteer & Community Hours Tracker)
 - **E4 – Kuota < 1 atau bukan bilangan bulat / jam ≤ 0 (langkah 9):** sistem menolak dan meminta perbaikan.
 - **E5 – Gagal menyimpan (kesalahan sistem/DB):** sistem menampilkan pesan gagal, data isian dipertahankan di formulir.
 
+---
+
+## UC-02 — Mengubah dan Membatalkan Kegiatan
+
+| Elemen | Isi |
+|--------|-----|
+| **Nama Use Case** | Mengubah dan Membatalkan Kegiatan |
+| **Actor** | Penyelenggara (utama); Sistem Notifikasi (pendukung); Relawan (penerima notifikasi) |
+| **Pre-condition** | Penyelenggara login dan merupakan pemilik kegiatan; kegiatan berstatus `DRAFT` atau `PUBLISHED`. |
+| **Post-condition (ubah)** | Data kegiatan diperbarui; jika `PUBLISHED` dan ada peserta, peserta dinotifikasi. |
+| **Post-condition (batal)** | Status `CANCELLED`; pendaftaran aktif menjadi `DIBATALKAN`; peserta dinotifikasi; tidak ada jam volunteer dikreditkan; kegiatan hilang dari katalog. |
+
+**Main Flow — Mengubah**
+1. Penyelenggara membuka daftar "Kegiatan Saya" dan memilih kegiatan.
+2. Sistem memeriksa kepemilikan (BR-14) dan status kegiatan (BR-08).
+3. Sistem menampilkan formulir edit berisi data saat ini.
+4. Penyelenggara mengubah data dan memilih "Simpan Perubahan".
+5. Sistem memvalidasi kelengkapan data wajib, tanggal (BR-04), kuota/jam (BR-05).
+6. Sistem memeriksa kuota baru ≥ jumlah peserta `DITERIMA` (BR-07).
+7. Sistem menyimpan perubahan dan mencatat riwayat perubahan (siapa, kapan, field).
+8. Jika kegiatan `PUBLISHED` dan tanggal/lokasi/jam berubah serta ada peserta, sistem mengirim notifikasi ke peserta (BR-10).
+9. Sistem menampilkan konfirmasi berhasil.
+
+**Main Flow — Membatalkan**
+1. Penyelenggara memilih "Batalkan Kegiatan" pada kegiatan miliknya.
+2. Sistem meminta alasan pembatalan dan konfirmasi.
+3. Penyelenggara mengisi alasan dan mengonfirmasi.
+4. Sistem memvalidasi alasan terisi (BR-09).
+5. Sistem mengubah status menjadi `CANCELLED`.
+6. Sistem mengubah semua pendaftaran `PENDING`/`DITERIMA` menjadi `DIBATALKAN`.
+7. Sistem menandai bahwa tidak ada jam volunteer yang dikreditkan.
+8. Sistem mengirim notifikasi berisi alasan ke seluruh peserta terdampak.
+9. Sistem menampilkan konfirmasi pembatalan.
+
+**Alternative Flow**
+- **A1 – Kegiatan `DRAFT`:** langkah notifikasi (8 ubah / 8 batal) dilewati karena belum ada peserta.
+- **A2 – Tidak ada perubahan data:** sistem menginformasikan "Tidak ada perubahan" tanpa menyimpan.
+- **A3 – Penyelenggara membatalkan konfirmasi pembatalan:** proses dihentikan, status tidak berubah.
+
+**Exception Flow**
+- **E1 – Bukan pemilik kegiatan (langkah 2):** akses ditolak (403).
+- **E2 – Status `COMPLETED` atau `CANCELLED` (langkah 2):** sistem menolak "Kegiatan tidak dapat diubah".
+- **E3 – Data wajib kosong / tanggal invalid / kuota atau jam invalid (langkah 5):** simpan ditolak dengan pesan spesifik.
+- **E4 – Kuota baru < jumlah peserta diterima (langkah 6):** simpan ditolak, sistem menampilkan jumlah peserta diterima saat ini.
+- **E5 – Alasan pembatalan kosong (batal, langkah 4):** pembatalan ditolak.
+- **E6 – Kegiatan sudah berjalan/lewat (tanggal mulai telah lewat) saat ubah tanggal:** perubahan tanggal ditolak (BR-04).
+- **E7 – Gagal mengirim notifikasi:** perubahan/pembatalan tetap tersimpan; notifikasi dimasukkan ke antrean retry dan dicatat di log.
+- **E8 – Konflik edit (versi data sudah berubah oleh sesi lain):** sistem meminta muat ulang.
+
+

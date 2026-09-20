@@ -1,0 +1,70 @@
+@startuml UC02_Ubah_Batal_Kegiatan
+title Activity Diagram - UC-02 Mengubah dan Membatalkan Kegiatan
+
+|Penyelenggara|
+start
+:Pilih kegiatan dari "Kegiatan Saya";
+|Sistem|
+if (Penyelenggara pemilik kegiatan?) then (ya)
+  if (Status DRAFT atau PUBLISHED?) then (ya)
+    |Penyelenggara|
+    if (Pilih aksi?) then (Ubah)
+      |Sistem|
+      :Tampilkan formulir edit dengan data saat ini;
+      |Penyelenggara|
+      :Ubah data dan simpan;
+      |Sistem|
+      if (Ada perubahan data?) then (ya)
+        if (Data wajib lengkap dan\ntanggal/kuota/jam valid?) then (ya)
+          if (Kuota baru >= jumlah peserta DITERIMA?) then (ya)
+            :Simpan perubahan + catat riwayat;
+            if (Status PUBLISHED, ada peserta,\ndan tanggal/lokasi/jam berubah?) then (ya)
+              :Kirim notifikasi perubahan ke peserta;
+            else (tidak)
+            endif
+            :Tampilkan konfirmasi berhasil;
+            stop
+          else (tidak)
+            :Tolak: kuota < peserta diterima;
+            stop
+          endif
+        else (tidak)
+          :Tolak: data wajib/tanggal/kuota tidak valid;
+          stop
+        endif
+      else (tidak)
+        :Tampilkan "Tidak ada perubahan";
+        stop
+      endif
+    else (Batalkan)
+      |Sistem|
+      :Minta alasan pembatalan dan konfirmasi;
+      |Penyelenggara|
+      if (Konfirmasi pembatalan?) then (ya)
+        :Isi alasan pembatalan;
+        |Sistem|
+        if (Alasan terisi?) then (ya)
+          :Ubah status menjadi CANCELLED;
+          :Ubah pendaftaran aktif menjadi DIBATALKAN;
+          :Pastikan tidak ada jam volunteer dikreditkan;
+          :Kirim notifikasi alasan ke semua peserta;
+          :Tampilkan konfirmasi pembatalan;
+          stop
+        else (tidak)
+          :Tolak: alasan wajib diisi;
+          stop
+        endif
+      else (tidak)
+        :Proses pembatalan dihentikan;
+        stop
+      endif
+    endif
+  else (tidak)
+    :Tolak: kegiatan COMPLETED/CANCELLED\ntidak dapat diubah;
+    stop
+  endif
+else (tidak)
+  :Tolak akses (403);
+  stop
+endif
+@enduml
