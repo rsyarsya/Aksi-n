@@ -1,0 +1,58 @@
+@startuml UC03_Kelola_Peserta
+title Activity Diagram - UC-03 Pengelolaan Peserta (Terima/Tolak Pendaftaran)
+
+|Penyelenggara|
+start
+:Buka kegiatan dan tab "Pendaftar";
+|Sistem|
+if (Pemilik kegiatan?) then (ya)
+  :Tampilkan pendaftar PENDING dan sisa kuota;
+  |Penyelenggara|
+  :Pilih pendaftar dan aksi;
+  |Sistem|
+  if (Kegiatan PUBLISHED dan\npendaftaran masih PENDING?) then (ya)
+    |Penyelenggara|
+    if (Aksi?) then (Terima)
+      |Sistem|
+      :Mulai transaksi + kunci baris kegiatan;
+      :Hitung sisa kuota = kuota - jumlah DITERIMA;
+      if (Sisa kuota > 0?) then (ya)
+        :Ubah status pendaftaran menjadi DITERIMA;
+        :Commit transaksi;
+        if (Kuota sekarang penuh?) then (ya)
+          :Tampilkan label "Kuota Penuh";
+          :Nonaktifkan tombol Terima;
+        else (tidak)
+        endif
+        :Kirim notifikasi "Diterima" ke relawan;
+        :Perbarui daftar dan sisa kuota;
+        stop
+      else (tidak)
+        :Rollback transaksi;
+        :Tolak: kuota penuh, status tetap PENDING;
+        stop
+      endif
+    else (Tolak)
+      |Penyelenggara|
+      :Isi alasan penolakan;
+      |Sistem|
+      if (Alasan terisi?) then (ya)
+        :Ubah status pendaftaran menjadi DITOLAK;
+        :Kirim notifikasi "Ditolak" + alasan ke relawan;
+        :Perbarui daftar pendaftar;
+        stop
+      else (tidak)
+        :Tolak: alasan wajib diisi;
+        stop
+      endif
+    endif
+  else (tidak)
+    :Tampilkan "Pendaftaran sudah diproses\natau kegiatan tidak aktif";
+    :Segarkan daftar;
+    stop
+  endif
+else (tidak)
+  :Tolak akses (403);
+  stop
+endif
+@enduml
