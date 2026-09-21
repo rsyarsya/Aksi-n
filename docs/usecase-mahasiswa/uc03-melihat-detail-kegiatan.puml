@@ -1,0 +1,43 @@
+@startuml UC03_Melihat_Detail_Kegiatan
+title Activity Diagram - UC-03 Melihat Detail Kegiatan
+
+|Mahasiswa|
+start
+:Pilih kartu kegiatan;
+
+|Sistem|
+:Terima identitas kegiatan;
+:Cari kegiatan berdasarkan identitas;
+if (Kegiatan ditemukan?) then (ya)
+  if (Masih PUBLISHED dan tidak CANCELLED?) then (ya)
+    :Ambil deskripsi, jadwal, lokasi,\npenyelenggara, kuota, syarat, dan tenggat;
+    if (Pengambilan detail berhasil?) then (ya)
+      :Hitung kuota berdasarkan\npeserta berstatus DITERIMA;
+      :Tampilkan halaman detail kegiatan;
+      |Mahasiswa|
+      :Baca detail kegiatan;
+      if (Pilih Kembali?) then (ya)
+        |Sistem|
+        :Kembalikan konteks daftar\ndan filter sebelumnya;
+        stop
+      else (tidak)
+        :Pertahankan halaman detail;
+        stop
+      endif
+    else (tidak)
+      :Tampilkan pesan kegagalan;
+      :Sediakan "Coba lagi"\ndan "Kembali ke daftar";
+      stop
+    endif
+  else (tidak)
+    :Tampilkan "Kegiatan tidak lagi tersedia";
+    :Sediakan "Kembali ke daftar";
+    stop
+  endif
+else (tidak)
+  :Tampilkan "Kegiatan tidak ditemukan";
+  :Sediakan "Kembali ke daftar";
+  stop
+endif
+@enduml
+
