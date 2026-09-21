@@ -1,0 +1,36 @@
+@startuml UC01_Melihat_Daftar_Kegiatan
+title Activity Diagram - UC-01 Melihat Daftar Kegiatan
+
+|Mahasiswa|
+start
+:Buka menu "Kegiatan";
+
+|Sistem|
+:Terima permintaan halaman daftar;
+:Ambil data kegiatan;
+if (Pengambilan data berhasil?) then (ya)
+  :Pilih kegiatan berstatus PUBLISHED\ndan tidak CANCELLED;
+  if (Data tersedia?) then (ya)
+    :Siapkan ringkasan setiap kegiatan;
+    :Tampilkan daftar kegiatan;
+    |Mahasiswa|
+    :Telusuri daftar kegiatan;
+    if (Pilih kartu kegiatan?) then (ya)
+      |Sistem|
+      :Teruskan identitas kegiatan\nke UC-03;
+      stop
+    else (tidak)
+      :Pertahankan daftar kegiatan;
+      stop
+    endif
+  else (tidak)
+    :Tampilkan "Belum ada kegiatan tersedia";
+    stop
+  endif
+else (tidak)
+  :Tampilkan pesan gagal memuat data;
+  :Sediakan aksi "Coba lagi";
+  stop
+endif
+@enduml
+
