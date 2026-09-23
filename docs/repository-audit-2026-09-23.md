@@ -26,7 +26,7 @@ Seluruh kontribusi bersifat penambahan. Perbandingan dua ujung branch dapat mena
 
 Branch sumber tidak dihapus atau ditulis ulang. Nama lama `feature` menghalangi `feature/*` karena benturan namespace ref Git. Branch perbaikan integrasi memakai `fix/*`. Branch Danis tetap memakai nama lama demi menjaga PR yang ada; perubahan nama legacy memerlukan koordinasi tim. Commit lama di main/develop tidak diubah hanya untuk memperbaiki pesan commit.
 
-PR perapian workflow menambahkan dokumen aturan yang diberikan pengguna, AGENTS.md, indeks README, .gitignore sesuai daftar workflow, template PR, dan laporan ini. Dokumen kebutuhan asli tidak dipindah atau diubah.
+PR perapian workflow menambahkan dokumen aturan yang diberikan pengguna, indeks README, `.gitignore` sesuai daftar workflow, template PR, dan laporan ini. File instruksi agen kemudian dikeluarkan dari repository agar tidak tampil sebagai dokumentasi proyek.
 
 ## Verifikasi
 

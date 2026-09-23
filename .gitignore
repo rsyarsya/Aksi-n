@@ -4,3 +4,4 @@ node_modules/
 bin/
 obj/
 *.log
+AGENTS.md
