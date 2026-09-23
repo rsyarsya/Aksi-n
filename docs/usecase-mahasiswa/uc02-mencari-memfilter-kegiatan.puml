@@ -1,0 +1,51 @@
+@startuml UC02_Mencari_Memfilter_Kegiatan
+title Activity Diagram - UC-02 Mencari atau Memfilter Kegiatan
+
+|Mahasiswa|
+start
+:Buka halaman daftar kegiatan;
+:Isi kata kunci (opsional);
+:Pilih kategori (opsional);
+:Isi rentang tanggal (opsional);
+:Pilih "Terapkan";
+
+|Sistem|
+:Terima parameter pencarian dan filter;
+if (Parameter valid?) then (ya)
+  :Batasi pada kegiatan PUBLISHED\ndan tidak CANCELLED;
+  :Cocokkan kata kunci dengan judul;
+  :Terapkan kategori dan tanggal\ndengan logika AND;
+  if (Pemrosesan berhasil?) then (ya)
+    if (Hasil tersedia?) then (ya)
+      :Tampilkan daftar hasil\ndan kriteria aktif;
+      |Mahasiswa|
+      :Tinjau hasil;
+      stop
+    else (tidak)
+      :Tampilkan "Tidak ada kegiatan yang sesuai";
+      :Sediakan "Ubah filter" dan "Reset";
+      |Mahasiswa|
+      if (Pilih Reset?) then (ya)
+        |Sistem|
+        :Hapus seluruh parameter;
+        :Muat daftar awal melalui UC-01;
+        stop
+      else (tidak)
+        :Kembalikan ke kontrol filter;
+        stop
+      endif
+    endif
+  else (tidak)
+    :Pertahankan parameter yang diisi;
+    :Tampilkan pesan gagal\ndan aksi "Coba lagi";
+    stop
+  endif
+else (tidak)
+  :Tandai rentang tanggal tidak valid;
+  :Tampilkan penjelasan kesalahan;
+  |Mahasiswa|
+  :Perbaiki rentang tanggal;
+  stop
+endif
+@enduml
+
