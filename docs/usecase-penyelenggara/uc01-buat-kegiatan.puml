@@ -1,0 +1,53 @@
+@startuml UC01_Buat_Kegiatan
+title Activity Diagram - UC-01 Membuat Kegiatan (Drafting & Publishing)
+
+|Penyelenggara|
+start
+:Pilih menu "Buat Kegiatan";
+|Sistem|
+:Tampilkan formulir kegiatan;
+|Penyelenggara|
+:Isi data kegiatan\n(judul, deskripsi, kategori, lokasi,\ntanggal, batas daftar, kuota, jam volunteer);
+if (Pilih aksi?) then (Simpan Draft)
+  |Sistem|
+  if (Judul terisi?) then (ya)
+    :Simpan kegiatan status DRAFT;
+    :Tampilkan konfirmasi draft tersimpan;
+    stop
+  else (tidak)
+    :Tampilkan error "Judul wajib diisi";
+    |Penyelenggara|
+    :Perbaiki isian;
+    detach
+  endif
+else (Publikasikan)
+  |Sistem|
+  if (Semua data wajib lengkap?) then (ya)
+    if (Tanggal mulai > sekarang\ndan tanggal selesai >= tanggal mulai\ndan batas daftar <= tanggal mulai?) then (ya)
+      if (Kuota >= 1 (bulat)\ndan jam volunteer > 0?) then (ya)
+        :Ubah status menjadi PUBLISHED;
+        :Catat waktu publikasi;
+        :Tampilkan kegiatan di katalog relawan;
+        :Tampilkan konfirmasi berhasil;
+        stop
+      else (tidak)
+        :Tampilkan error kuota/jam tidak valid;
+        |Penyelenggara|
+        :Perbaiki isian;
+        detach
+      endif
+    else (tidak)
+      :Tampilkan error tanggal tidak valid;
+      |Penyelenggara|
+      :Perbaiki isian;
+      detach
+    endif
+  else (tidak)
+    :Tandai field wajib yang kosong;
+    :Status tetap DRAFT;
+    |Penyelenggara|
+    :Lengkapi isian;
+    detach
+  endif
+endif
+@enduml
