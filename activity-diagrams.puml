@@ -1,0 +1,72 @@
+@startuml
+title Activity Diagram - UC01: Verifikasi Kehadiran & Jam Volunteer
+
+|Penyelenggara|
+start
+:Pilih daftar kegiatan;
+|Sistem|
+:Tampilkan daftar peserta;
+|Penyelenggara|
+:Ubah status kehadiran peserta;
+:Input jumlah jam volunteer;
+:Klik "Simpan Data";
+|Sistem|
+if (Validasi jam volunteer?) then (Valid)
+  :Simpan data kehadiran & jam volunteer;
+  :Tampilkan notifikasi berhasil;
+  stop
+else (Tidak Valid)
+  :Tampilkan pesan error "Jam tidak valid";
+  |Penyelenggara|
+  :Input ulang jumlah jam;
+  detach
+endif
+
+@enduml
+
+@startuml
+title Activity Diagram - UC02: Validasi Penyelesaian Kegiatan
+
+|Penyelenggara|
+start
+:Buka halaman validasi penyelesaian;
+|Sistem|
+:Tampilkan ringkasan jam & kehadiran peserta;
+|Penyelenggara|
+:Pilih peserta & klik "Validasi Penyelesaian";
+|Sistem|
+if (Syarat minimal terisi/lulus?) then (Ya)
+  :Ubah status peserta menjadi "Completed";
+  :Update log aktivitas peserta;
+  stop
+else (Tidak)
+  :Tampilkan peringatan "Syarat belum terpenuhi";
+  :Set status peserta menjadi "Incomplete";
+  stop
+endif
+
+@enduml
+
+@startuml
+title Activity Diagram - UC03: Penerbitan Sertifikat / Bukti Digital
+
+|Penyelenggara|
+start
+:Pilih menu "Generate Sertifikat";
+|Sistem|
+:Ambil data peserta, peran, dan jam;
+:Load template sertifikat;
+if (Proses Generate PDF) then (Berhasil)
+  :Generate sertifikat PDF & QR Code unik;
+  :Simpan sertifikat ke server storage;
+  :Update tautan sertifikat di profil peserta;
+  :Tampilkan konfirmasi berhasil;
+  stop
+else (Gagal)
+  :Tampilkan pesan error "Gagal membuat sertifikat";
+  |Penyelenggara|
+  :Klik "Coba Lagi";
+  detach
+endif
+
+@enduml
